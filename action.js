@@ -65,9 +65,9 @@ module.exports = class {
     }
 
     if (argv.labels) {
-      providedFields.fields.push({
+      providedFields.push({
         key: 'labels',
-        value: ['community']
+        value: ['as']
       })
     }
 
