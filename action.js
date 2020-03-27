@@ -65,10 +65,9 @@ module.exports = class {
     }
 
     if (argv.labels) {
-      console.log('LABELS: ' + argv.labels)
-      providedFields.push({
+      providedFields.fields.push({
         key: 'labels',
-        value: argv.labels.split(','),
+        value: ['community']
       })
     }
 
