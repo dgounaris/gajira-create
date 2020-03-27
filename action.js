@@ -64,6 +64,14 @@ module.exports = class {
       })
     }
 
+    if (argv.labels) {
+      console.log('LABELS: ' + argv.labels)
+      providedFields.push({
+        key: 'labels',
+        value: argv.labels.split(','),
+      })
+    }
+
     // TODO fields
     if (argv.fields) {
       providedFields = [...providedFields, ...this.transformFields(argv.fields)]
