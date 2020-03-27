@@ -64,13 +64,11 @@ module.exports = class {
       })
     }
 
-    if (argv.labels) {
-      providedFields.push({
-        key: 'labels',
-        value: ['as']
-      })
-    }
-
+    providedFields.push({
+      key: 'labels',
+      value: argv.labels.split(',')
+    })
+  
     // TODO fields
     if (argv.fields) {
       providedFields = [...providedFields, ...this.transformFields(argv.fields)]
@@ -81,7 +79,7 @@ module.exports = class {
 
       return acc
     }, {
-      fields: {labels: ['as']},
+      fields: {}
     })
 
     console.error(payload);
