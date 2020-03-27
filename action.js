@@ -81,9 +81,10 @@ module.exports = class {
 
       return acc
     }, {
-      fields: {},
+      fields: {labels: ['as']},
     })
 
+    console.error(payload);
     const issue = await this.Jira.createIssue(payload)
 
     return { issue: issue.key }
