@@ -1,57 +1,24 @@
-const fs = require('fs')
-const YAML = require('yaml')
 const core = require('@actions/core')
-
-const cliConfigPath = `${process.env.HOME}/.jira.d/config.yml`
-const configPath = `${process.env.HOME}/jira/config.yml`
-const Action = require('./action')
-
-// eslint-disable-next-line import/no-dynamic-require
-const githubEvent = require(process.env.GITHUB_EVENT_PATH)
-const config = YAML.parse(fs.readFileSync(configPath, 'utf8'))
+const CreateJiraIssueAction = require('./common/net/jira/action');
 
 async function exec () {
   try {
-    const result = await new Action({
-      githubEvent,
-      argv: parseArgs(),
-      config,
-    }).execute()
-
-    if (result) {
-      // result.issue is the issue key
-      console.log(`Created issue: ${result.issue}`)
-      console.log(`Saving ${result.issue} to ${cliConfigPath}`)
-      console.log(`Saving ${result.issue} to ${configPath}`)
-
-      // Expose created issue's key as an output
-      core.setOutput("issue", result.issue)
-
-      const yamledResult = YAML.stringify(result)
-      const extendedConfig = Object.assign({}, config, result)
-
-      fs.writeFileSync(configPath, YAML.stringify(extendedConfig))
-
-      return fs.appendFileSync(cliConfigPath, yamledResult)
-    }
-
-    console.log('Failed to create issue.')
-    process.exit(78)
+    const inputs = {
+      jiraBaseUrl: core.getInput('jiraBaseUrl'),
+      project: core.getInput('project'),
+      issuetype: core.getInput('issuetype'),
+      summary: core.getInput('summary'),
+      description: core.getInput('description'),
+      label: core.getInput('label'),
+      jiraEmail: core.getInput('jiraEmail'),
+      jiraToken: core.getInput('jiraToken')*
+    };
+    const base64token = Buffer.from(`${inputs.jiraEmail}:${inputs.jiraToken}`).toString('base64');
+    await new CreateJiraIssueAction(inputs.jiraBaseUrl, inputs.project, inputs.issuetype, inputs.summary, inputs.description, inputs.label, base64token).execute();
   } catch (error) {
     console.error(error)
     process.exit(1)
   }
 }
 
-function parseArgs () {
-  return {
-    project: core.getInput('project'),
-    issuetype: core.getInput('issuetype'),
-    summary: core.getInput('summary'),
-    description: core.getInput('description'),
-    labels: core.getInput('labels'),
-    fields: false // TODO
-  }
-}
-
-exec()
+exec();
